@@ -5,10 +5,12 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
+
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
       - name: Setup Java
         uses: actions/setup-java@v5
@@ -23,14 +25,21 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Check environment
+        run: |
+          java -version
+          flutter --version
+          flutter doctor -v
+
       - name: Get dependencies
         run: flutter pub get
 
       - name: Build debug APK
-        run: flutter build apk --debug
+        run: flutter build apk --debug --verbose
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: trueface-apk
           path: build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: error
